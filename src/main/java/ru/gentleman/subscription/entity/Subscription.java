@@ -31,4 +31,6 @@ public class Subscription {
     private Instant expirationDate;
 
     private Instant createdAt;
+
+    private Boolean isActive;
 }
