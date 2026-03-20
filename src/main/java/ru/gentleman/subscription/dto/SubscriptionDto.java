@@ -12,6 +12,7 @@ public record SubscriptionDto(
         SubscriptionStatus status,
         Instant startDay,
         Instant expirationDate,
-        Instant createdAt
+        Instant createdAt,
+        Boolean isActive
 ) {
 }
