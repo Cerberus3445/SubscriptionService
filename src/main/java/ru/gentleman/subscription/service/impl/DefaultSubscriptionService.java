@@ -123,4 +123,20 @@ public class DefaultSubscriptionService implements SubscriptionService {
         subscription.setIsActive(false);
         this.cacheClear.clearAllSubscriptionsByUserId(subscription.getUserId());
     }
+
+    @Override
+    public List<SubscriptionDto> getExpiredSubscriptions() {
+        log.info("getExpiredSubscriptions");
+
+        return this.subscriptionMapper.toDto(
+                this.subscriptionRepository.find100ExpiredSubscriptions()
+        );
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        log.info("existsById {}", id);
+
+        return this.subscriptionRepository.existsById(id);
+    }
 }

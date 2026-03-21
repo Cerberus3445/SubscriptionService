@@ -22,4 +22,8 @@ public interface SubscriptionService {
 
     void delete(UUID id);
 
+    List<SubscriptionDto> getExpiredSubscriptions();
+
+    boolean existsById(UUID id);
+
 }
