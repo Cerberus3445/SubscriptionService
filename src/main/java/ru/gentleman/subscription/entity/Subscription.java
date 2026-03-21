@@ -26,8 +26,6 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
-    private Instant startDay;
-
     private Instant expirationDate;
 
     private Instant createdAt;
