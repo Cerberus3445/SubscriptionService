@@ -10,7 +10,7 @@ public interface SubscriptionService {
 
     SubscriptionDto get(UUID id);
 
-    List<SubscriptionDto> getByUserId(UUID userId);
+    List<SubscriptionDto> getAllByUserId(UUID userId);
 
     SubscriptionDto create(SubscriptionDto subscriptionDto);
 

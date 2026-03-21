@@ -2,7 +2,7 @@ package ru.gentleman.subscription.query;
 
 import java.util.UUID;
 
-public record FindSubscriptionById(
-        UUID id
+public record FindAllSubscriptionsByUserIdQuery(
+        UUID userId
 ) {
 }
