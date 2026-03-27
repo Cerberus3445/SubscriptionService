@@ -125,6 +125,7 @@ public class DefaultSubscriptionService implements SubscriptionService {
     }
 
     @Override
+    @Transactional //cannot execute SELECT FOR UPDATE in a read-only transaction
     public List<SubscriptionDto> getExpiredSubscriptions() {
         log.info("getExpiredSubscriptions");
 

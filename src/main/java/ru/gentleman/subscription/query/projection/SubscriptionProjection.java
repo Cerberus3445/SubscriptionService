@@ -1,6 +1,7 @@
 package ru.gentleman.subscription.query.projection;
 
 import lombok.RequiredArgsConstructor;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
 import ru.gentleman.common.dto.SubscriptionStatus;
@@ -12,6 +13,7 @@ import ru.gentleman.subscription.dto.SubscriptionDto;
 import ru.gentleman.subscription.service.SubscriptionService;
 
 @Component
+@ProcessingGroup("subscription-group")
 @RequiredArgsConstructor
 public class SubscriptionProjection {
 
