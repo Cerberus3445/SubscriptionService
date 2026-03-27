@@ -4,12 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandExecutionException;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
-import org.axonframework.modelling.command.AggregateCreationPolicy;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
-import org.axonframework.modelling.command.CreationPolicy;
 import org.axonframework.spring.stereotype.Aggregate;
 import ru.gentleman.common.command.ActivateSubscriptionCommand;
+import ru.gentleman.common.command.RenewSubscriptionCommand;
 import ru.gentleman.common.dto.SubscriptionStatus;
 import ru.gentleman.common.event.SubscriptionCanceledEvent;
 import ru.gentleman.common.event.SubscriptionCreatedEvent;
@@ -46,41 +45,46 @@ public class SubscriptionAggregate {
 
     private Set<UUID> processedOrders = new HashSet<>();
 
+    public SubscriptionAggregate() {
+
+    }
+
     @CommandHandler
-    @CreationPolicy(AggregateCreationPolicy.CREATE_IF_MISSING) //если агрегат не существует, создаём его
-    public void handle(ActivateSubscriptionCommand command) {
-        if(id == null) {
-            SubscriptionCreatedEvent event = SubscriptionCreatedEvent.builder()
-                    .id(command.id())
-                    .courseId(command.courseId())
-                    .createdAt(command.createdAt())
-                    .expirationDate(Instant.now().plus(Duration.ofDays(command.days())))
-                    .isActive(command.isActive())
-                    .userId(command.userId())
-                    .build();
+    public SubscriptionAggregate(ActivateSubscriptionCommand command) {
+        SubscriptionCreatedEvent event = SubscriptionCreatedEvent.builder()
+                .id(command.id())
+                .courseId(command.courseId())
+                .createdAt(command.createdAt())
+                .expirationDate(Instant.now().plus(Duration.ofDays(command.days())))
+                .isActive(command.isActive())
+                .orderId(command.orderId())
+                .userId(command.userId())
+                .build();
 
-            AggregateLifecycle.apply(event);
-        } else {
-            if(processedOrders.contains(command.orderId())) {
-                log.warn("OrderID already processed, skipping...");
-                return;
-            }
+        AggregateLifecycle.apply(event);
+    }
 
-            Instant newExpirationDate;
-
-            if(status == SubscriptionStatus.EXPIRED || status == SubscriptionStatus.CANCELLED) {
-                newExpirationDate = Instant.now().plus(Duration.ofDays(command.days()));
-            } else { // ACTIVE
-                newExpirationDate = expirationDate.plus(Duration.ofDays(command.days()));
-            }
-
-            SubscriptionRenewedEvent event = new SubscriptionRenewedEvent(command.id(),
-                    command.orderId(),
-                    newExpirationDate
-            );
-
-            AggregateLifecycle.apply(event);
+    @CommandHandler
+    public void handle(RenewSubscriptionCommand command) {
+        if(processedOrders.contains(command.orderId())) {
+            log.warn("OrderID already processed, skipping...");
+            return;
         }
+
+        Instant newExpirationDate;
+
+        if(status == SubscriptionStatus.EXPIRED || status == SubscriptionStatus.CANCELLED) {
+            newExpirationDate = Instant.now().plus(Duration.ofDays(command.days()));
+        } else { // ACTIVE
+            newExpirationDate = expirationDate.plus(Duration.ofDays(command.days()));
+        }
+
+        SubscriptionRenewedEvent event = new SubscriptionRenewedEvent(command.id(),
+                command.orderId(),
+                newExpirationDate
+        );
+
+        AggregateLifecycle.apply(event);
     }
 
     @EventSourcingHandler
@@ -90,7 +94,7 @@ public class SubscriptionAggregate {
         this.userId = event.userId();
         this.status = SubscriptionStatus.ACTIVE;
         this.expirationDate = event.expirationDate();
-        this.createdAt = event.expirationDate();
+        this.createdAt = event.createdAt();
         this.isActive = event.isActive();
         this.processedOrders.add(event.orderId());
     }

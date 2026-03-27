@@ -4,13 +4,14 @@ import ru.gentleman.subscription.dto.SubscriptionDto;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SubscriptionService {
 
     SubscriptionDto get(UUID id);
 
-    List<SubscriptionDto> getByUserId(UUID userId);
+    List<SubscriptionDto> getAllByUserId(UUID userId);
 
     SubscriptionDto create(SubscriptionDto subscriptionDto);
 

@@ -44,7 +44,7 @@ public class DefaultSubscriptionService implements SubscriptionService {
 
     @Override
     @Cacheable(value = "allSubscriptionsByUserId", key = "#userId")
-    public List<SubscriptionDto> getByUserId(UUID userId) {
+    public List<SubscriptionDto> getAllByUserId(UUID userId) {
         log.info("getByUserId {}", userId);
 
         return this.subscriptionMapper.toDto(
@@ -125,6 +125,7 @@ public class DefaultSubscriptionService implements SubscriptionService {
     }
 
     @Override
+    @Transactional //cannot execute SELECT FOR UPDATE in a read-only transaction
     public List<SubscriptionDto> getExpiredSubscriptions() {
         log.info("getExpiredSubscriptions");
 
